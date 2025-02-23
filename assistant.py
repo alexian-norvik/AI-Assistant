@@ -6,7 +6,7 @@ from langgraph.graph import START, StateGraph
 from typing_extensions import Annotated, TypedDict
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, trim_messages
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -15,6 +15,10 @@ load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 model = init_chat_model("gpt-4o", model_provider="openai")
+
+trimmer = trim_messages(
+    max_tokens=65, strategy="last", token_counter=model, include_system=True, allow_partial=False, start_on="human"
+)
 
 
 class State(TypedDict):
@@ -36,7 +40,8 @@ workflow = StateGraph(state_schema=State)
 
 
 def call_model(state: State):
-    prompt = prompt_template.invoke(state)
+    trimmed_messages = trimmer.invoke(state["messages"])
+    prompt = prompt_template.invoke({"messages": trimmed_messages, "language": state["language"]})
     response = model.invoke(prompt)
     return {"messages": response}
 
