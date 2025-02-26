@@ -1,5 +1,4 @@
 import os
-import getpass
 from typing import List
 
 from dotenv import load_dotenv
@@ -16,7 +15,7 @@ import llms_constants
 load_dotenv()
 
 if not os.getenv("OPENAI_API_KEY"):
-    os.environ["OPENAI_API_KEY"] = getpass.getpass("Please set you OpenAI API Key as your environment variable.")
+    raise EnvironmentError("Setup the OpenAI API key as your environment variable.")
 
 
 @tool
@@ -65,7 +64,7 @@ class ChatResponse(BaseModel):
 
 app = FastAPI()
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0.7, max_retries=3)
+llm = ChatOpenAI(model="gpt-4o", temperature=0.3, max_retries=3)
 
 tools = [house_search]
 
@@ -84,7 +83,7 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 
 
 @app.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+def chat(request: ChatRequest):
     try:
         chat_history = [msg.to_langchain() for msg in request.chat_history]
 
