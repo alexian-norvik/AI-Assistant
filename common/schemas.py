@@ -28,7 +28,7 @@ class ChatRequest(BaseModel):
     query: str
     language: str
     name: str
-    chat_history: List[Message]
+    chat_history: List[Message] = []
 
 
 class ChatResponse(BaseModel):
