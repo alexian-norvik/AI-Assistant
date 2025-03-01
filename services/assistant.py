@@ -23,7 +23,7 @@ def chat(query: str, language: str, name: str) -> str:
         api_key=OPENAI_API_KEY,
     )
 
-    prompt = ChatPromptTemplate([("system", llms_constants.SYSTEM_PROMPT), ("user", "{input}")])
+    prompt = ChatPromptTemplate.from_messages([("system", llms_constants.SYSTEM_PROMPT), ("user", "{input}")])
 
     chain = prompt | llm
 
