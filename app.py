@@ -12,6 +12,9 @@ def chat(request: schemas.ChatRequest):
     try:
         chat_history = [message.to_langchain() for message in request.chat_history]
 
+        if len(chat_history) > 15:
+            chat_history = chat_history[-15:]
+
         result = chatbot(query=request.query, language=request.language, name=request.name, chat_history=chat_history)
 
         # update chat history
