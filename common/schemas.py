@@ -33,4 +33,5 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
+    language: str
     chat_history: List[Message]
