@@ -28,7 +28,7 @@ def chatbot(query: str, language: str, name: str, chat_history: list) -> str:
     tools = [agent_tools.house_search]
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", llms_constants.SYSTEM_PROMPT),
+            ("system", llms_constants.CHATBOT_SYSTEM_PROMPT),
             ("user", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
             MessagesPlaceholder(variable_name="chat_history"),
