@@ -19,7 +19,7 @@ def chat(request: schemas.ChatRequest):
         conversation_history.append(schemas.Message(message_type=llms_constants.HUMAN_MSG, content=request.query))
         conversation_history.append(schemas.Message(message_type=llms_constants.AI_MSG, content=result))
 
-        return schemas.ChatResponse(response=result, chat_history=conversation_history)
+        return schemas.ChatResponse(response=result, chat_history=conversation_history, language=request.language)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {e}")
 
