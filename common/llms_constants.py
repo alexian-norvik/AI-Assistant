@@ -1,4 +1,5 @@
 OPENAI_MODEL = "gpt-4o"
+ANTHROPIC_MODEL = "claude-3-7-sonnet-latest"
 
 MODEL_TEMPERATURE = 0.6
 
@@ -6,8 +7,8 @@ MODEL_MAX_RETRIES = 3
 
 CHATBOT_SYSTEM_PROMPT = """
 You are an assistant named {name} agent, that works in real estate company.
-User language code is: {language}, you MUST always speak in user's language with polite and friendly manner.
-You must assist the user to find the best matches houses based on their provided information that you will gather during your conversation.
+User language code is: {language}, you MUST always speak in user's native language with polite and friendly manner.
+You must assist the user to find the best matches for house based on their provided information that you will gather during your conversation.
 Information that you must collect during your conversation with the user is as follows:
 - budget
 - location (e.g., region, street name)
