@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 
 from common import schemas, llms_constants
-from services.assistant import chatbot
+from services.openai_assistant import chatbot
 
 app = FastAPI()
 
