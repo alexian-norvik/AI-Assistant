@@ -10,7 +10,7 @@ if not OPENAI_API_KEY:
     raise EnvironmentError("Setup OpenAI key as your environment variable")
 
 
-def chatbot(query: str, language: str, name: str, chat_history: list) -> str:
+def openai_chatbot(query: str, language: str, name: str, chat_history: list) -> str:
     """
     Chat with the assistant
     :param query: User query
