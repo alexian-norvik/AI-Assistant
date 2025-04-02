@@ -135,3 +135,18 @@ information_gathering_format = {
         },
     },
 }
+
+SAMPLE = {
+    "region": "region_id",
+    "address": "address location",
+    "sale": {
+        "apartment": {
+            "price": "number",
+            "Rooms": "number",
+            "total_space": "decimal_number",
+            "condition_options": "not repaired/medium condition/Fresh repaired",
+            "building_type_options": "stone/Panel/New buildings",
+            "Floor": "Comma formatted",
+        }
+    },
+}
