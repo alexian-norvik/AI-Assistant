@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel
 from langchain_core.messages import AIMessage, HumanMessage
 
-from common import llms_constants
+from common import constants, llms_constants
 
 
 class Message(BaseModel):
@@ -29,6 +29,7 @@ class ChatRequest(BaseModel):
     language: str
     name: str
     chat_history: List[Message] = []
+    information: dict = constants.information_gathering_format
 
 
 class ChatResponse(BaseModel):
