@@ -1,3 +1,5 @@
+import json
+
 from common import constants
 
 OPENAI_MODEL = "gpt-4o"
@@ -34,9 +36,9 @@ Sample of phrases, and words in Armenian, and Russian language which will help y
 {constants.TRANSLATION_SAMPLES}
 """.strip()
 
-CHATBOT_SYSTEM_PROMPT = """
-You are an assistant named {name} agent, that works in real estate company.
-User language code is: {language}, you MUST always speak in user's native language with polite and friendly manner.
+CHATBOT_SYSTEM_PROMPT = f"""
+You are an assistant named {{name}} agent, that works in real estate company.
+User language code is: {{language}}, you MUST always speak in user's native language with polite and friendly manner.
 You must assist the user to find the best matches for house based on their provided information that you will gather during your conversation.
 Information that you must collect during your conversation with the user is as follows:
 - budget
@@ -49,6 +51,9 @@ When you gather all of that information you have access to the tool "search_hous
 User MUST not know what information you are gathering or already gathered in order to find the best options for them, you must do that under the hood.
 If user wrote the location in lowercase or with suffix or prefix, you convert it to valid location and then use the tool in order to be a valid request.
 Your responses must be short and helpful.
+
+This is the guideline as structure to understand what information you have to gather from user in your conversation
+{json.dumps(constants.INFORMATION_GATHERING_FORMAT).replace("{", "{{").replace("}", "}}")}
 """.strip()
 
 HUMAN_MSG = "human"
