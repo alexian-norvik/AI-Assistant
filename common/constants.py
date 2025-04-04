@@ -18,7 +18,7 @@ AVAILABLE_REGIONS = {
     "Shengavit": 8,
 }
 
-translation = {
+TRANSLATION_SAMPLES = {
     "price": {"hy": "Արժեքը", "ru": "Общая стоимость"},
     "total space": {"hy": "Մակերես", "ru": "Общая площадь"},
     "Purpose": {"hy": "Տարածքի նշանակությունը", "ru": "Назначение помещения"},
@@ -50,7 +50,7 @@ translation = {
     "Floor": {"hy": "Հարկ", "ru": "Этаж"},
 }
 
-information_ids = {
+INFORMATION_IDS = {
     "price": 38,
     "total_space": 12,
     "purpose": 44,
@@ -81,7 +81,7 @@ information_ids = {
     "daily_price": 40,
 }
 
-information_gathering_format = {
+INFORMATION_GATHERING_FORMAT = {
     "region": "region_id",
     "address": "address location",
     "sale": {
