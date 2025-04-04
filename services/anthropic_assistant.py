@@ -53,6 +53,8 @@ async def anthropic_chatbot(query: str, language: str, name: str, chat_history: 
         stop=None,
     )
 
+    english_query = await translate_query(query=query, language_code=language)
+
     tools = [agent_tools.house_search]
     prompt = ChatPromptTemplate(
         [
@@ -68,7 +70,7 @@ async def anthropic_chatbot(query: str, language: str, name: str, chat_history: 
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
     response = await agent_executor.ainvoke(
-        {"language": language, "name": name, "input": query, "chat_history": chat_history}
+        {"language": language, "name": name, "input": english_query, "chat_history": chat_history}
     )
 
     return response["output"][0]["text"]
