@@ -1,4 +1,5 @@
 import uvicorn
+from loguru import logger
 from fastapi import FastAPI, HTTPException
 
 from common import schemas, llms_constants
@@ -31,14 +32,14 @@ def openai_chat(request: schemas.ChatRequest):
 
 
 @app.post("/anthropic_chat", response_model=schemas.ChatResponse)
-def anthropic_chat(request: schemas.ChatRequest):
+async def anthropic_chat(request: schemas.ChatRequest):
     try:
         chat_history = [message.to_langchain() for message in request.chat_history]
 
         if len(chat_history) > 15:
             chat_history = chat_history[-15:]
 
-        result = anthropic_chatbot(
+        result = await anthropic_chatbot(
             query=request.query, language=request.language, name=request.name, chat_history=chat_history
         )
 
@@ -49,6 +50,7 @@ def anthropic_chat(request: schemas.ChatRequest):
 
         return schemas.ChatResponse(response=result, chat_history=conversation_history, language=request.language)
     except Exception as e:
+        logger.error(f"Failed to generate user response, error message: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 
