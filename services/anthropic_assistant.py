@@ -35,14 +35,14 @@ async def translate_query(query: str, language_code: str) -> str:
     return translated_query
 
 
-def anthropic_chatbot(query: str, language: str, name: str, chat_history: list) -> str:
+async def anthropic_chatbot(query: str, language: str, name: str, chat_history: list) -> str:
     """
     chatbot for conversation with the user, to gather the necessary data in order to search for the best house.
     :param query: user last query
     :param language: language code of the conversation
     :param name: name of the agent.
     :param chat_history: conversation history
-    :return: generated ai response.
+    :return: generated AI response.
     """
     llm = ChatAnthropic(
         model_name=llms_constants.ANTHROPIC_MODEL,
@@ -66,6 +66,8 @@ def anthropic_chatbot(query: str, language: str, name: str, chat_history: list) 
     agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-    response = agent_executor.invoke({"language": language, "name": name, "input": query, "chat_history": chat_history})
+    response = await agent_executor.ainvoke(
+        {"language": language, "name": name, "input": query, "chat_history": chat_history}
+    )
 
     return response["output"][0]["text"]
