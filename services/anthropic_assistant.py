@@ -5,7 +5,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 import config
-from common import llms_constants
+from common import constants, llms_constants
 from services import agent_tools
 
 if not config.ANTHROPIC_API_KEY:
@@ -54,9 +54,10 @@ async def anthropic_chatbot(query: str, language: str, name: str, chat_history: 
     )
 
     tools = [agent_tools.house_search]
-    prompt = ChatPromptTemplate.from_messages(
+    prompt = ChatPromptTemplate(
         [
             ("system", llms_constants.CHATBOT_SYSTEM_PROMPT),
+            ("assistant", json.dumps(constants.INFORMATION_GATHERING_FORMAT).replace("{", "{{").replace("}", "}}")),
             ("user", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
             MessagesPlaceholder(variable_name="chat_history"),
