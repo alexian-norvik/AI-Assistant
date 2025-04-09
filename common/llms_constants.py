@@ -12,6 +12,8 @@ MODEL_MAX_RETRIES = 3
 
 MODEL_MAX_TOKENS = 1000
 
+TIKTOKEN_MODEL = "o200k_base"  # gpt-4o tokenizer (BPE) method
+
 TRANSLATOR_SYSTEM_PROMPT = f"""
 You are a specialized AI assistant for {{language_code}}-English translation.
 
@@ -34,6 +36,18 @@ Your response MUST be a valid JSON object:
 Do not include any explanation, notes, or additional content outside of this JSON object.
 Sample of phrases, and words in Armenian, and Russian language which will help you for better translation:
 {constants.TRANSLATION_SAMPLES}
+""".strip()
+
+CONVERSATION_SUMMARIZER_PROMPT = """
+You are a helpful AI assistant tasked with summarizing the user last query from conversation of user with Real Estate AI assistant.
+
+guide to follow step by step:
+- You must always write concise key points in English, highlighting user's main issues and key information.
+- Always write the summary in English, regardless of the original conversation's language.
+- Ensure the summary is concise and captures essential details.
+- Prioritize clarity and relevance.
+
+Your response must be only the summarization of user query, no extra note or description.
 """.strip()
 
 CHATBOT_SYSTEM_PROMPT = f"""
