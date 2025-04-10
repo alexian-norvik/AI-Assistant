@@ -4,6 +4,7 @@ from typing import Optional
 from loguru import logger
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_anthropic import ChatAnthropic
+from langfuse.decorators import observe
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 import config
@@ -14,6 +15,7 @@ if not config.ANTHROPIC_API_KEY:
     raise EnvironmentError("Setup Anthropic API key as your environment variable.")
 
 
+@observe()
 async def translate_query(query: str, language_code: str) -> Optional[str]:
     """
     Translate user query to english
@@ -40,6 +42,7 @@ async def translate_query(query: str, language_code: str) -> Optional[str]:
         logger.error(f"Failed to translate the query, error message: {e}")
 
 
+@observe()
 async def summarize_query(query: str) -> Optional[str]:
     """
     Summarizes user query that exceeds the 10 token limit.
@@ -61,6 +64,7 @@ async def summarize_query(query: str) -> Optional[str]:
         logger.error(f"Failed to summarize the user query, error message: {e}")
 
 
+@observe()
 async def anthropic_chatbot(query: str, language: str, name: str, chat_history: list) -> Optional[str]:
     """
     chatbot for conversation with the user, to gather the necessary data in order to search for the best house.
