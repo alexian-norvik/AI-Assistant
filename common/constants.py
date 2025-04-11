@@ -1,3 +1,5 @@
+import json
+
 AVAILABLE_REGIONS = {
     "Kanaker_Zeytun_id": 4,
     "Malatia_Sebastia": 14,
@@ -26,7 +28,7 @@ TRANSLATION_SAMPLES = {
     "Shop": {"hy": "Խանութ", "ru": "Магазин"},
     "Restaurant": {"hy": "Ռեստորան", "ru": "Ресторан"},
     "Others": {"hy": "Այլ", "ru": "Другие"},
-    "Rooms": {"hy": "Սենյակների քանակ", "ru": "Число комнат"},
+    "rooms": {"hy": "Սենյակների քանակ", "ru": "Число комнат"},
     "Condition": {"hy": "Վիճակ", "ru": "Состояние"},
     "Not repaired": {"hy": "Պետ.վիճակ", "ru": "Без ремонта"},
     "Medium condition": {"hy": "Միջին վիճակ", "ru": "Средний ремонт"},
@@ -92,7 +94,7 @@ INFORMATION_GATHERING_FORMAT = {
         },
         "apartment": {
             "price": "number",
-            "Rooms": "number",
+            "rooms": "number",
             "total_space": "decimal_number",
             "condition_options": "not repaired/medium condition/Fresh repaired",
             "building_type_options": "stone/Panel/New buildings",
@@ -142,7 +144,7 @@ SAMPLE = {
     "sale": {
         "apartment": {
             "price": "number",
-            "Rooms": "number",
+            "rooms": "number",
             "total_space": "decimal_number",
             "condition_options": "not repaired/medium condition/Fresh repaired",
             "building_type_options": "stone/Panel/New buildings",
@@ -150,3 +152,13 @@ SAMPLE = {
         }
     },
 }
+
+AVAILABLE_REGIONS_STR = json.dumps(AVAILABLE_REGIONS).replace("{", "{{").replace("}", "}}")
+
+TRANSLATION_SAMPLES_STR = json.dumps(TRANSLATION_SAMPLES).replace("{", "{{").replace("}", "}}")
+
+INFORMATION_IDS_STR = json.dumps(INFORMATION_IDS).replace("{", "{{").replace("}", "}}")
+
+INFORMATION_GATHERING_FORMAT_STR = json.dumps(INFORMATION_GATHERING_FORMAT).replace("{", "{{").replace("}", "}}")
+
+SAMPLE_STR = json.dumps(SAMPLE).replace("{", "{{").replace("}", "}}")
