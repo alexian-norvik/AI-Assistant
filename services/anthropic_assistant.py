@@ -9,6 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 import config
 from common import constants, llms_constants
+from config import langfuse
 from services import agent_tools
 
 if not config.ANTHROPIC_API_KEY:
@@ -98,11 +99,19 @@ async def anthropic_chatbot(query: str, language: str, name: str, chat_history: 
 
         english_query = await translate_query(query=query, language_code=language)
 
+        system_prompt = langfuse.get_prompt(name="assistant_base_prompt", label="latest")
+        compiled_system_prompt = system_prompt.compile(
+            language=language,
+            name=name,
+            cheatsheet=constants.INFORMATION_GATHERING_FORMAT_STR,
+            regions=constants.AVAILABLE_REGIONS_STR,
+            sample=constants.SAMPLE_STR,
+        )
         tools = [agent_tools.house_search]
+
         prompt = ChatPromptTemplate(
             [
-                ("system", llms_constants.CHATBOT_SYSTEM_PROMPT),
-                ("assistant", json.dumps(constants.INFORMATION_GATHERING_FORMAT).replace("{", "{{").replace("}", "}}")),
+                ("system", compiled_system_prompt.strip()),
                 ("user", "{input}"),
                 MessagesPlaceholder(variable_name="agent_scratchpad"),
                 MessagesPlaceholder(variable_name="chat_history"),
