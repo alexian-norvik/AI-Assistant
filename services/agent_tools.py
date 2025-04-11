@@ -1,14 +1,15 @@
+import json
+
 from langchain_core.tools import tool
 
 
 @tool
-def house_search(location: str) -> bool:
+def house_search(gathered_info: str) -> dict:
     """
     Check if in the provided location there is any house for sale or not.
-    :param location: Provided location by the user.
+    :param gathered_info: gathered information from conversation with the client.
     :return: True or False whether any house is available or not.
     """
-    if location in ["Yerevan", "Gyumri", "Spitak"]:
-        return True
-    else:
-        return False
+    gathered_info = json.loads(gathered_info)
+
+    return gathered_info
