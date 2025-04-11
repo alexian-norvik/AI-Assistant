@@ -4,7 +4,7 @@ from typing import Optional
 from loguru import logger
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_anthropic import ChatAnthropic
-from langfuse.decorators import observe
+from langfuse.decorators import observe, langfuse_context
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 import config
@@ -37,6 +37,12 @@ async def translate_query(query: str, language_code: str) -> Optional[str]:
         )
         translated_query = json.loads(translator.content[0].text)["translated_query"]
 
+        langfuse_context.update_current_observation(
+            input=query,
+            model=llms_constants.ANTHROPIC_MODEL,
+            usage_details={"input": translator.usage.input_tokens, "output": translator.usage.output_tokens},
+        )
+
         return translated_query
     except Exception as e:
         logger.error(f"Failed to translate the query, error message: {e}")
@@ -58,6 +64,12 @@ async def summarize_query(query: str) -> Optional[str]:
         )
 
         summarized_query = summarizer.content[0].text
+
+        langfuse_context.update_current_observation(
+            input=query,
+            model=llms_constants.ANTHROPIC_MODEL,
+            usage_details={"input": summarizer.usage.input_tokens, "output": summarizer.usage.output_tokens},
+        )
 
         return summarized_query
     except Exception as e:
