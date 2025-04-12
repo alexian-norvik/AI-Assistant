@@ -47,7 +47,7 @@ Your response must be only the summarization of user query, no extra note or des
 """.strip()
 
 CHATBOT_SYSTEM_PROMPT = """
-Act as if you are a real estate AI agent named {{name}}.
+Act as if you are a real estate agent named {{name}}.
 
 You will be responsible to help the client to find the best house based on their needs and capabilities.
 Client native language is: {{language}}
