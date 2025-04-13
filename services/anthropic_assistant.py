@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Optional
 
 from loguru import logger
@@ -17,26 +18,25 @@ if not config.ANTHROPIC_API_KEY:
 
 
 @observe(as_type="translation")
-async def translate_query(query: str, language_code: str) -> Optional[str]:
+async def translate_query(query: str) -> Optional[str]:
     """
     Translate user query to english
     :param query: last query of the user
-    :param language_code: language code of the conversation
     :return: translated query to English
     """
     try:
-        system_prompt = llms_constants.TRANSLATOR_SYSTEM_PROMPT.replace("{language_code}", language_code)
-
+        system_prompt = langfuse.get_prompt(name="translator", label="latest")
+        compiled_system_prompt = system_prompt.compile(armenian_transliteration=constants.ARMENIAN_TRANSLITERATION)
         translator = await config.ANTHROPIC_MODEL.messages.create(
             model=llms_constants.ANTHROPIC_MODEL,
-            system=system_prompt,
+            system=compiled_system_prompt.strip(),
             messages=[
                 {"role": "user", "content": f"query: {query}"},
             ],
             temperature=llms_constants.TRANSLATION_TEMPERATURE,
             max_tokens=llms_constants.MODEL_MAX_TOKENS,
         )
-        translated_query = json.loads(translator.content[0].text)["translated_query"]
+        translated_query = json.loads(translator.content[0].text)
 
         langfuse_context.update_current_observation(
             input=query,
@@ -44,9 +44,9 @@ async def translate_query(query: str, language_code: str) -> Optional[str]:
             usage_details={"input": translator.usage.input_tokens, "output": translator.usage.output_tokens},
         )
 
-        return translated_query
+        return translated_query["english"]
     except Exception as e:
-        logger.error(f"Failed to translate the query, error message: {e}")
+        logging.error(f"Failed to translate the query, error message: {e}", exc_info=True)
 
 
 @observe(as_type="summarizer")
@@ -97,12 +97,14 @@ async def anthropic_chatbot(query: str, language: str, name: str, chat_history: 
             stop=None,
         )
 
-        english_query = await translate_query(query=query, language_code=language)
+        translated_query = await translate_query(query=query)
 
         system_prompt = langfuse.get_prompt(name="assistant_base_prompt", label="latest")
         compiled_system_prompt = system_prompt.compile(
             language=language,
             name=name,
+            supported_languages=constants.SUPPORTING_LANGUAGES,
+            armenian_transliteration=constants.ARMENIAN_TRANSLITERATION_STR,
             cheatsheet=constants.INFORMATION_GATHERING_FORMAT_STR,
             regions=constants.AVAILABLE_REGIONS_STR,
             sample=constants.SAMPLE_STR,
@@ -119,10 +121,10 @@ async def anthropic_chatbot(query: str, language: str, name: str, chat_history: 
         )
 
         agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=prompt)
-        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
 
         response = await agent_executor.ainvoke(
-            {"language": language, "name": name, "input": english_query, "chat_history": chat_history}
+            {"language": language, "name": name, "input": translated_query, "chat_history": chat_history}
         )
 
         return response["output"][0]["text"]
