@@ -13,3 +13,11 @@ config.langfuse.create_prompt(
         "model_tools": ["house_search"],
     },
 )
+
+config.langfuse.create_prompt(
+    name="translator",
+    type="text",
+    prompt=llms_constants.TRANSLATOR_SYSTEM_PROMPT,
+    labels=["latest"],
+    config={"model": llms_constants.ANTHROPIC_MODEL, "temperature": 0.0, "supported_languages": ["hy"]},
+)
