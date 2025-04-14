@@ -1,5 +1,6 @@
 import json
 import logging
+import warnings
 from typing import Optional
 
 from langchain.agents import AgentType, initialize_agent
@@ -13,6 +14,8 @@ import config
 from common import constants, llms_constants
 from config import langfuse
 from services import agent_tools
+
+warnings.filterwarnings("ignore")
 
 
 @observe(as_type="translation")
