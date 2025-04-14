@@ -158,6 +158,7 @@ def chatbot(query, language, name, memory, gathered_info):
         verbose=True,
         memory=memory,
         agent_kwargs={"system_message": compiled_system_prompt},
+        handle_parsing_errors=True,
     )
 
     response = agent.invoke(query)
