@@ -1,67 +1,47 @@
 import uvicorn
 import tiktoken
-from loguru import logger
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
+from langchain.memory import ConversationBufferMemory
 
 from common import schemas, llms_constants
-from services import anthropic_assistant
-from services.openai_assistant import openai_chatbot
+from services import ai_assistant
 
 app = FastAPI()
 
 
-@app.post("/openai_chat", response_model=schemas.ChatResponse)
-def openai_chat(request: schemas.ChatRequest):
-    try:
-        chat_history = [message.to_langchain() for message in request.chat_history]
+@app.post("/assistant", response_model=schemas.ChatResponse)
+async def assistant(request: schemas.ChatRequest):
+    user_query = request.query
+    chat_history = request.chat_history
 
-        if len(chat_history) > 15:
-            chat_history = chat_history[-15:]
+    if len(chat_history) > 15:
+        chat_history = chat_history[-15:]
 
-        result = openai_chatbot(
-            query=request.query, language=request.language, name=request.name, chat_history=chat_history
-        )
+    query_encoding = tiktoken.get_encoding(llms_constants.TIKTOKEN_MODEL)
+    tokens = query_encoding.encode(user_query)
 
-        # update chat history
-        conversation_history = request.chat_history.copy()
-        conversation_history.append(schemas.Message(message_type=llms_constants.HUMAN_MSG, content=request.query))
-        conversation_history.append(schemas.Message(message_type=llms_constants.AI_MSG, content=result))
+    if len(tokens) > 30:
+        user_query = ai_assistant.summarize_query(query=user_query)
 
-        return schemas.ChatResponse(response=result, chat_history=conversation_history, language=request.language)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    if not chat_history:
+        chat_history = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
+    translated_query = await ai_assistant.translate_query(query=user_query)
+    chat_response, chat_history = ai_assistant.chatbot(
+        query=translated_query,
+        language=request.language,
+        name=request.name,
+        memory=chat_history,
+        gathered_info=request.gathered_info,
+    )
 
-@app.post("/anthropic_chat", response_model=schemas.ChatResponse)
-async def anthropic_chat(request: schemas.ChatRequest):
-    try:
-        user_query = request.query
-        chat_history = [message.to_langchain() for message in request.chat_history]
+    gathered_info = await ai_assistant.gather_information(
+        chat_history=chat_history, gathered_info=request.gathered_info
+    )
 
-        if len(chat_history) > 15:
-            chat_history = chat_history[-15:]
-
-        query_encoding = tiktoken.get_encoding(llms_constants.TIKTOKEN_MODEL)
-        tokens = query_encoding.encode(user_query)
-
-        if len(tokens) > 30:
-            user_query = anthropic_assistant.summarize_query(query=user_query)
-
-        chat_response = await anthropic_assistant.anthropic_chatbot(
-            query=user_query, language=request.language, name=request.name, chat_history=chat_history
-        )
-
-        # update chat history
-        conversation_history = request.chat_history.copy()
-        conversation_history.append(schemas.Message(message_type=llms_constants.HUMAN_MSG, content=user_query))
-        conversation_history.append(schemas.Message(message_type=llms_constants.AI_MSG, content=chat_response))
-
-        return schemas.ChatResponse(
-            response=chat_response, chat_history=conversation_history, language=request.language
-        )
-    except Exception as e:
-        logger.error(f"Failed to generate user response, error message: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    return schemas.ChatResponse(
+        response=chat_response, chat_history=chat_history, language=request.language, gathered_info=gathered_info
+    )
 
 
 if __name__ == "__main__":
