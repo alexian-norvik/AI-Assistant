@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel
 from langchain_core.messages import AIMessage, HumanMessage
 
@@ -28,10 +26,12 @@ class ChatRequest(BaseModel):
     query: str
     language: str
     name: str
-    chat_history: List[Message] = []
+    chat_history: dict = {}
+    gathered_info: dict
 
 
 class ChatResponse(BaseModel):
     response: str
     language: str
-    chat_history: List[Message]
+    chat_history: dict
+    gathered_info: dict
